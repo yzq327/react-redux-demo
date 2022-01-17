@@ -1,3 +1,4 @@
 import { createStore } from "redux";
-import { reducer } from "../reducer";
-export default createStore(reducer);
+// import { reducer } from "../reducer";
+import { loveReducer } from "../reducer";
+export default createStore(loveReducer);
