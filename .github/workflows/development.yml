@@ -1,0 +1,85 @@
+name: Build and deploy 
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    - name: Install dependencies
+      run: npm install
+    - name: Run tests
+      run: npm test
+      
+
+  # build-image:
+  #   name: Run tests, package and build image
+  #   runs-on: [self-hosted, macOS, X64, test-runner]
+  #   outputs:
+  #     tags: ${{ steps.set-output.outputs.tags }}
+  #   steps:
+  #     - name: Checkout the repository
+  #       uses: actions/checkout@v3
+  #     - name: Login to ACR
+  #       uses: aliyun/acr-login@v1
+  #       with:
+  #         login-server: 'https://${{ env.REGISTRY }}'
+  #         region-id: '${{ env.REGION_ID }}'
+  #         username: '${{ secrets.REGISTRY_USERNAME }}'
+  #         password: '${{ secrets.REGISTRY_PASSWORD }}'
+  #         instance-id: '${{ env.ACR_INSTANCE_ID }}'
+  #     - name: Extract metadata (push) for details
+  #       id: meta
+  #       uses: docker/metadata-action@v5
+  #       with:
+  #         images: ${{ env.REGISTRY }}/${{ env.ACR_INSTANCE_ID }}/${{ env.GITHUB_REPOSITORY }}/${{ env.IMAGE_NAME }}
+  #         tags: |
+  #           type=raw,value=sea.${{ github.run_number }}.${{ github.run_attempt }}
+  #     - name: Set output
+  #       id: set-output
+  #       run: echo "tags=${{ steps.meta.outputs.tags }}" >> $GITHUB_OUTPUT
+  #     - name: Build and push Docker image
+  #       id: docker_push
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: .
+  #         push: ${{ github.event_name != 'pull_request' }}
+  #         tags: ${{ steps.meta.outputs.tags }}
+  #         labels: ${{ steps.meta.outputs.labels }}
+  #     - name: Remove useless images
+  #       run: docker rmi ${{ steps.meta.outputs.tags }}
+
+  # deploy-qa:
+  #   name: deploy qa environment
+  #   needs: build-and-push-image
+  #   runs-on: [self-hosted, macOS, X64, test-runner]
+  #   outputs:
+  #     tags: ${{ needs.build-and-push-image.outputs.tags }}
+  #   environment: testing
+  #   env:
+  #     DB_USERNAME: ${{ secrets.DB_USERNAME }}
+  #     DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  #     AMI_USERNAME: ${{ secrets.AMI_USERNAME }}
+  #     AMI_PASSWORD: ${{ secrets.AMI_PASSWORD }}
+  #   steps:
+  #     - name: Deploy docker image
+  #       run: |-
+  #         ./deploy.sh bot_service ${{ needs.build-and-push-image.outputs.tags }} qa '${{ env.DB_USERNAME }}' '${{ env.DB_PASSWORD }}' '${{ env.AMI_USERNAME }}' '${{ env.AMI_PASSWORD }}'
+
+  # deploy-uat:
+  #     name: deploy uat environment
+  #     needs: deploy-qa
+  #     runs-on: [self-hosted, macOS, X64, test-runner]
+  #     environment: uat
+  #     steps:
+  #       - name: Deploy docker image
+  #         run: |-
+  #           ./deploy.sh bot_service ${{ needs.deploy-qa.outputs.tags }} uat '${{ env.DB_USERNAME }}' '${{ env.DB_PASSWORD }}' '${{ env.AMI_USERNAME }}' '${{ env.AMI_PASSWORD }}'
