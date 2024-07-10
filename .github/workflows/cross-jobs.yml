@@ -11,7 +11,7 @@ jobs:
       - name: Set output variable
         id: set-output
         run: |-
-          echo "::set-output name=my_output:: Secret from Job 1"
+          echo "my_output=Secret from Job 1 ${{ secrets.ENV_SECRET }}" >> $GITHUB_OUTPUT
 
   job2:
     runs-on: ubuntu-latest
