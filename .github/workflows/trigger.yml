@@ -1,0 +1,13 @@
+name: Workflow 1
+
+on: [push]
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Workflow 2
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          event-type: trigger-workflow-2
+          client-payload: '{"message": "Hello from Workflow 1"}'

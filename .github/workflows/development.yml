@@ -22,14 +22,14 @@ jobs:
     runs-on: [self-hosted, test-runner]
     needs: build
     env:
-      DB_USERNAME: ${{ secrets.DB_USERNAME }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      ENV_SECRET: ${{ secrets.ENV_SECRET }}
+      PROD_SECRET: ${{ secrets.PROD_SECRET }}
     steps:
     - name: Deploy to Development
 
       run: |
         echo "Deploying to development environment..."
-        ./deploy-dev.sh '${{ env.DB_USERNAME }}' '${{ env.DB_PASSWORD }}'
+        ./deploy-dev.sh '${{ env.ENV_SECRET }}' '${{ env.PROD_SECRET }}'
 
   deploy-to-prod:
     needs: deploy-to-dev
@@ -37,13 +37,13 @@ jobs:
     environment: 
       name: production
     env:
-      DB_USERNAME: ${{ secrets.DB_USERNAME }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      ENV_SECRET: ${{ secrets.ENV_SECRET }}
+      PROD_SECRET: ${{ secrets.PROD_SECRET }}
     steps:
     - name: Deploy to Production Environment
       run: |
         echo "Deploying to production environment..."
-        ./deploy-prod.sh '${{ env.DB_USERNAME }}' '${{ env.DB_PASSWORD }}'
+        ./deploy-prod.sh '${{ env.ENV_SECRET }}' '${{ env.ENV_SECRET }}'
   
 
   # build-image:
