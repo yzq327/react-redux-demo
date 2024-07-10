@@ -3,7 +3,7 @@ const initState = {
 };
 
 //接受action，进行逻辑处理
-exports.reducer = (state = initState, action) => {
+export const reducer = (state = initState, action) => {
   switch (action.type) {
     case "add":
       return {
@@ -20,7 +20,7 @@ const loveInitState = {
 };
 
 //接受action，进行逻辑处理
-exports.loveReducer = (state = loveInitState, action) => {
+export const loveReducer = (state = loveInitState, action) => {
   switch (action.type) {
     case "send_love":
       return {
