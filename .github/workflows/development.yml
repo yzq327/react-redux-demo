@@ -1,4 +1,4 @@
-name: Build and deploy 
+name: CI/CD Pipeline
 
 on:
   push:
@@ -17,7 +17,32 @@ jobs:
       run: npm install
     - name: Run tests
       run: npm run test
-      
+  
+  deploy-to-dev:
+    runs-on: [self-hosted, test-runner]
+    needs: build
+    env:
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+    steps:
+    - name: Deploy to Development
+
+      run: |
+        echo "Deploying to development environment..."
+        ./deploy-dev.sh '${{ env.DB_USERNAME }}' '${{ env.DB_PASSWORD }}'
+
+  deploy-to-prod:
+    needs: deploy-to-dev
+    runs-on: [self-hosted, test-runner]
+    env:
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+    steps:
+    - name: Deploy to Production Environment
+      run: |
+        echo "Deploying to production environment..."
+        ./deploy-prod.sh '${{ env.DB_USERNAME }}' '${{ env.DB_PASSWORD }}'
+  
 
   # build-image:
   #   name: Run tests, package and build image
@@ -63,9 +88,9 @@ jobs:
   #   outputs:
   #     tags: ${{ needs.build-and-push-image.outputs.tags }}
   #   environment: testing
-  #   env:
-  #     DB_USERNAME: ${{ secrets.DB_USERNAME }}
-  #     DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+    # env:
+    #   DB_USERNAME: ${{ secrets.DB_USERNAME }}
+    #   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
   #     AMI_USERNAME: ${{ secrets.AMI_USERNAME }}
   #     AMI_PASSWORD: ${{ secrets.AMI_PASSWORD }}
   #   steps:
