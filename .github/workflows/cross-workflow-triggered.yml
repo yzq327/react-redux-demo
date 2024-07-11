@@ -1,4 +1,4 @@
-name: Workflow 2
+name: Cross Workflow triggerred Example
 
 on:
   repository_dispatch:

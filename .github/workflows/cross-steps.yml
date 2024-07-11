@@ -1,4 +1,4 @@
-name: Cross Jobs Example
+name: Cross Steps Example
 
 on: [push]
 
